@@ -1,0 +1,18 @@
+{
+  "name": "Wet Ink",
+  "short_name": "Wet Ink",
+  "description": "Write your book. Let the world read.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo-icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
