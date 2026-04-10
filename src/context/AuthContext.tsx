@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
 } from "firebase/auth";
@@ -87,8 +88,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, provider);
-    // Page will redirect to Google then back — result handled in useEffect above
+    try {
+      // Try popup first (works on desktop/Chrome)
+      const cred = await signInWithPopup(auth, provider);
+      const existing = await getUserProfile(cred.user.uid);
+      if (!existing) {
+        await createUserProfile({
+          uid: cred.user.uid,
+          username: cred.user.displayName || cred.user.email?.split("@")[0] || "writer",
+          bio: "",
+          isPublic: true,
+          allowLiveReading: true,
+        });
+      }
+      const p = await getUserProfile(cred.user.uid);
+      setProfile(p);
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      // If popup was blocked, fall back to redirect
+      if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user") {
+        await signInWithRedirect(auth, new GoogleAuthProvider());
+      } else {
+        throw err;
+      }
+    }
   };
 
   const logout = async () => {

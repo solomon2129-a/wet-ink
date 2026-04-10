@@ -41,9 +41,11 @@ export function AuthScreen() {
     try {
       await signInWithGoogle();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
+      const e = err as { message?: string; code?: string };
+      const msg = e.code
+        ? `${e.code}: ${e.message || "Google sign-in failed"}`
+        : (e.message || "Google sign-in failed");
       setError(msg.replace("Firebase: ", "").trim());
-    } finally {
       setLoading(false);
     }
   };
