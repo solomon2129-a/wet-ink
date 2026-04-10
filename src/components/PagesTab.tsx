@@ -15,7 +15,7 @@ type View = "cover" | "writing";
 
 interface Heading { id: string; text: string; el: Element; indent: number }
 
-export function PagesTab() {
+export function PagesTab({ onWritingModeChange }: { onWritingModeChange?: (writing: boolean) => void }) {
   const { user, profile, refreshProfile } = useAuth();
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,6 +145,8 @@ export function PagesTab() {
       </div>
     );
   }
+
+  useEffect(() => { onWritingModeChange?.(view === "writing"); }, [view, onWritingModeChange]);
 
   /* ─── WRITING VIEW ─── */
   if (view === "writing") {

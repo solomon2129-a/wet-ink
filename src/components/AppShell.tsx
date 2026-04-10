@@ -8,22 +8,27 @@ type Tab = "pages" | "discover";
 
 export function AppShell() {
   const [activeTab, setActiveTab] = useState<Tab>("pages");
+  const [writingMode, setWritingMode] = useState(false);
 
   return (
     <div className="flex flex-col h-full" style={{ background: "var(--bg)" }}>
       <div className="flex-1 overflow-hidden">
-        {activeTab === "pages" && <PagesTab />}
+        {activeTab === "pages" && <PagesTab onWritingModeChange={setWritingMode} />}
         {activeTab === "discover" && <DiscoverTab />}
       </div>
 
-      {/* Bottom Nav — minimal, icon + label, no pill */}
+      {/* Bottom Nav — hidden in writing mode */}
       <nav
-        className="flex-shrink-0"
+        className="flex-shrink-0 transition-all overflow-hidden"
         style={{
-          borderTop: "1px solid var(--border)",
+          borderTop: writingMode ? "none" : "1px solid var(--border)",
           background: "rgba(8,8,9,0.96)",
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
+          maxHeight: writingMode ? "0px" : "120px",
+          opacity: writingMode ? 0 : 1,
+          pointerEvents: writingMode ? "none" : "auto",
+          transition: "max-height 0.3s ease, opacity 0.2s ease, border 0.2s ease",
         }}
       >
         <div className="flex items-center justify-center gap-16 py-3 pb-5">
