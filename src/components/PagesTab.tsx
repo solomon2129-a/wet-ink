@@ -13,7 +13,7 @@ const PINNED_EMAIL = "solomonsam2129@gmail.com";
 
 type View = "cover" | "writing";
 
-interface Heading { id: string; text: string; el: Element }
+interface Heading { id: string; text: string; el: Element; indent: number }
 
 export function PagesTab() {
   const { user, profile, refreshProfile } = useAuth();
@@ -345,20 +345,36 @@ export function PagesTab() {
                       <button
                         key={h.id}
                         onClick={() => jumpToHeading(h.id)}
-                        className="flex items-center gap-3 w-full text-left px-3 py-3 rounded-xl transition-all group"
-                        style={{ background: "transparent" }}
+                        className="flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl transition-all"
+                        style={{
+                          background: "transparent",
+                          paddingLeft: `${12 + h.indent * 16}px`,
+                        }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface2)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
-                        <span
-                          className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-xs font-semibold"
-                          style={{ background: "var(--accent-soft)", color: "var(--accent)", fontSize: "10px" }}
-                        >
-                          {i + 1}
-                        </span>
+                        {h.indent === 0 && (
+                          <span
+                            className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center font-semibold"
+                            style={{ background: "var(--accent-soft)", color: "var(--accent)", fontSize: "10px" }}
+                          >
+                            {i + 1}
+                          </span>
+                        )}
+                        {h.indent > 0 && (
+                          <span
+                            className="flex-shrink-0 w-1 h-1 rounded-full"
+                            style={{ background: "var(--muted)", opacity: 0.4, marginLeft: "4px" }}
+                          />
+                        )}
                         <span
                           className="truncate"
-                          style={{ fontFamily: "Georgia, serif", fontSize: "14px", color: "#e8e8f0", lineHeight: 1.3 }}
+                          style={{
+                            fontFamily: "Georgia, serif",
+                            fontSize: h.indent === 0 ? "14px" : "13px",
+                            color: h.indent === 0 ? "#e8e8f0" : "var(--muted)",
+                            lineHeight: 1.3,
+                          }}
                         >
                           {h.text}
                         </span>

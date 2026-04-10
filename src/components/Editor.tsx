@@ -9,7 +9,7 @@ import { createPortal } from "react-dom";
 import { useState } from "react";
 
 export interface EditorHandle {
-  getHeadings: () => { id: string; text: string; el: Element }[];
+  getHeadings: () => { id: string; text: string; el: Element; indent: number }[];
   scrollToHeading: (id: string) => void;
   scrollToBottom: () => void;
 }
@@ -35,7 +35,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(
 
     const editor = useEditor({
       extensions: [
-        StarterKit.configure({ heading: { levels: [1] } }),
+        StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
         Placeholder.configure({ placeholder: "Begin your story…" }),
         Image.configure({ inline: false, allowBase64: true }),
       ],
@@ -72,11 +72,13 @@ const Editor = forwardRef<EditorHandle, EditorProps>(
     useImperativeHandle(ref, () => ({
       getHeadings() {
         if (!editorWrapRef.current) return [];
-        const els = editorWrapRef.current.querySelectorAll("h1");
+        const els = editorWrapRef.current.querySelectorAll("h1, h2, h3");
         return Array.from(els).map((el, i) => {
           const id = `heading-${i}`;
           el.setAttribute("data-heading-id", id);
-          return { id, text: el.textContent || "Untitled chapter", el };
+          const tag = el.tagName.toLowerCase();
+          const indent = tag === "h1" ? 0 : tag === "h2" ? 1 : 2;
+          return { id, text: el.textContent || "Untitled chapter", el, indent };
         });
       },
       scrollToHeading(id: string) {
