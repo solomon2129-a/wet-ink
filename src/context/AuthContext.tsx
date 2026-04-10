@@ -8,7 +8,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { getUserProfile, createUserProfile, UserProfile } from "@/lib/firestore";
@@ -38,6 +39,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Handle Google redirect result (fires after redirect back to app)
+    getRedirectResult(auth).then(async (result) => {
+      if (result?.user) {
+        const existing = await getUserProfile(result.user.uid);
+        if (!existing) {
+          await createUserProfile({
+            uid: result.user.uid,
+            username: result.user.displayName || result.user.email?.split("@")[0] || "writer",
+            bio: "",
+            isPublic: true,
+            allowLiveReading: true,
+          });
+        }
+      }
+    }).catch(() => {});
+
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
@@ -70,19 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-    const existing = await getUserProfile(cred.user.uid);
-    if (!existing) {
-      await createUserProfile({
-        uid: cred.user.uid,
-        username: cred.user.displayName || cred.user.email?.split("@")[0] || "writer",
-        bio: "",
-        isPublic: true,
-        allowLiveReading: true,
-      });
-    }
-    const p = await getUserProfile(cred.user.uid);
-    setProfile(p);
+    await signInWithRedirect(auth, provider);
+    // Page will redirect to Google then back — result handled in useEffect above
   };
 
   const logout = async () => {
