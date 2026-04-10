@@ -69,6 +69,32 @@ html, body {
   color: var(--muted); font-style: italic;
 }
 
+/* Images */
+.tiptap-editor img {
+  max-width: 100%; height: auto;
+  border-radius: 12px; margin: 1.2em 0;
+  display: block;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.tiptap-editor img.ProseMirror-selectednode {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* H1 chapter label */
+.tiptap-editor h1 {
+  position: relative;
+  padding-top: 1.6em;
+  margin-top: 2.4em;
+}
+.tiptap-editor h1::before {
+  content: "— Chapter";
+  position: absolute; top: 0; left: 0;
+  font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent);
+  opacity: 0.5; font-family: system-ui, sans-serif;
+  font-weight: 500; font-style: normal;
+}
+
 /* Reading view */
 .reading-content {
   font-family: 'Georgia', 'Times New Roman', serif;
